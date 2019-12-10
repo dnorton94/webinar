@@ -12,7 +12,7 @@ const sessionClient = new dialogflow.SessionsClient({
 });
 const sessionPath = sessionClient.sessionPath(projectId, sessionId);
 
-var conv = new sdk.ComponentSession("Introduction_ed41cb77c01605_vp3", "test");
+var conv = new sdk.ComponentSession("Introduction_ed41cb77c01605", "test");
 
 // var isHandlingAccountOpen = false;
 const stages = ["name","workout","schedule","reminder"]
@@ -20,18 +20,19 @@ var stage = "name";
 
 async function processCoco(input) {
   const response = await conv.call(input);
+  console.dir(response)
   if (response instanceof Error) {
     return Promise.resolve("ERROR");
   }
-  return Promise.resolve(response.response);
+  return Promise.resolve(response);
 }
 const processName = async (input)=>{
   const res = await processCoco(input)
 
-  if (response.component_done) {
+  if (res.component_done) {
     stage = "workout"
   }
-  return Promise.resolve(response.response);
+  return Promise.resolve(res.response);
   
   // Introduction_ed41cb77c01605
 }
