@@ -12,26 +12,35 @@ const sessionClient = new dialogflow.SessionsClient({
 });
 const sessionPath = sessionClient.sessionPath(projectId, sessionId);
 
-const conv = new sdk.ComponentSession("register_vp3", "test");
+var conv = new sdk.ComponentSession("Introduction_ed41cb77c01605_vp3", "test");
 
-var isHandlingAccountOpen = false;
+// var isHandlingAccountOpen = false;
+const stages = ["name","workout","schedule","reminder"]
+var stage = "name";
 
 async function processCoco(input) {
   const response = await conv.call(input);
   if (response instanceof Error) {
     return Promise.resolve("ERROR");
   }
-  if (response.component_done) {
-    isHandlingAccountOpen = false;
-  }
   return Promise.resolve(response.response);
 }
+const processName = async (input)=>{
+  const res = await processCoco(input)
 
-async function process(input) {
-  console.log(`processing, project id is ${projectId}`);
-  if (isHandlingAccountOpen) {
-    return processCoco(input);
+  if (response.component_done) {
+    stage = "workout"
   }
+  return Promise.resolve(response.response);
+  
+  // Introduction_ed41cb77c01605
+}
+
+
+const processdf = async (input)=>{
+  console.log(`sending to df`);
+
+
   // The text query request.
   const request = {
     session: sessionPath,
@@ -42,8 +51,6 @@ async function process(input) {
       }
     }
   };
-
-  console.log(`sending to df`);
   try {
     const responses = await sessionClient.detectIntent(request);
     console.log(`df result received`);
@@ -67,5 +74,23 @@ async function process(input) {
     );
   }
 }
+async function process(input) {
+  var r = "";
+
+  switch (stage) {
+    case "name":
+      r = await processName(input);
+      break;
+    case "workout":
+      r = await processdf(input);
+      break;
+    default:
+      break;
+  }
+  return Promise.resolve(r);
+
+}
+
+
 
 exports.process = process;
